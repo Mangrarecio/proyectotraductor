@@ -16,17 +16,22 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0' # Versión compatible
+          flutter-version: '3.22.0' # Bajamos a una versión más compatible con Flet
 
-      - name: Install Python & Flet
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flet deep-translator
 
+      - name: Pre-accept Android Licenses
+        run: |
+          # Esto acepta las licencias antes de que Flet empiece a compilar
+          yes | sdkmanager --licenses || true
+
       - name: Build APK
         run: |
-          # El comando 'yes' responde automáticamente 'y' a cualquier pregunta
-          yes | flet build apk --project .
+          # Quitamos el comando 'yes' de aquí para evitar el "Broken pipe"
+          flet build apk --project . --no-version-check
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
